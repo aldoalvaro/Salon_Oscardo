@@ -1,0 +1,165 @@
+import React from 'react';
+
+import Sidebar from '../layouts/Sidebar';
+import Header from '../layouts/Header';
+import PageHeader from '../components/PageHeader';
+
+import { MdPeople, MdBusiness, MdAttachMoney } from 'react-icons/md';
+import { FiActivity } from 'react-icons/fi';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+// Data Mockup
+const chartData = [
+  { name: 'Jan', total: 10500000 },
+  { name: 'Feb', total: 8750000 },
+  { name: 'Mar', total: 9500000 },
+  { name: 'Apr', total: 12000000 },
+  { name: 'May', total: 11000000 },
+  { name: 'Jun', total: 7950000},
+];
+
+export default function Dashboard() {
+  return (
+    <div className="flex h-screen bg-[#fafafa] font-sans text-slate-800">
+      <Sidebar />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <PageHeader 
+            title="Dashboard" 
+            description="Selamat Datang di Dashboard Laporan Operasional Salon Oscardo" 
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <StatCard title="Total Karyawan" value="4" percentage="4 orang" icon={<MdPeople className="w-6 h-6 text-slate-400" />} />
+            <StatCard title="Total Pelayanan" value="45" percentage="+8%" icon={<MdBusiness className="w-6 h-6 text-slate-400" />} />
+            <StatCard title="Pendapatan" value="Rp.9.381.000" percentage="+18%" icon={<MdAttachMoney className="w-6 h-6 text-slate-400" />} />
+          </div>
+
+          {/* CHART */}
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+  <h2 className="text-lg font-semibold mb-6 text-slate-800">Tren Pemasukan</h2>
+  <div className="h-75 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+        
+        <YAxis 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{fill: '#64748b', fontSize: 12}} 
+          width={60} 
+          // 2. Format Sumbu Y menjadi "Rp XT" (contoh: Rp 42 Jt) agar ringkas
+          tickFormatter={(value) => `Rp ${value / 1000000} Jt`} 
+        />
+        
+        {/* 3. Tooltip tetap menampilkan angka penuh saat di-hover */}
+        <Tooltip 
+          formatter={(value) => 
+            new Intl.NumberFormat('id-ID', { 
+              style: 'currency', 
+              currency: 'IDR',
+              minimumFractionDigits: 0 
+            }).format(value)
+          }
+        />
+        
+        <Area type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorTotal)" />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+          {/* BOTTOM ROW (Activity & Tasks) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+            
+            {/* Recent Activity */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <h2 className="text-lg font-semibold mb-6 text-slate-800">Aktivitas Terbaru</h2>
+              <div className="space-y-6">
+                <ActivityItem title="Transaksi" desc="Rp.450.000, Paket Totok Wajah" time="5 hours ago" />
+                <ActivityItem title="Pengeluaran" desc="Rp.1.500.000, Pembelian stock creambath" time="1 day ago" isLast />
+                <ActivityItem title="Karyawan Baru" desc="Susi" time="2 Bulan lalu" />
+              </div>
+            </div>
+
+            {/* Upcoming Tasks */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <h2 className="text-lg font-semibold mb-6 text-slate-800">Tugas Mendatang</h2>
+              <div className="space-y-4">
+                <TaskItem title="Restock Cat Rambut" time="Besok" />
+                <TaskItem title="Membersihkan ruangan wanita" time="Besok jam 8 pagi" />
+                <TaskItem title="Promosi Iklan di Instagram" time="Besok jam 10 pagi" />
+              </div>
+            </div>
+
+          </div>
+          
+          {/* Footer */}
+          <footer className="pt-4 border-t border-slate-200 text-sm text-slate-500 flex justify-between items-center pb-8">
+            <p>© 2026, dibuat dengan ❤️ oleh Tim Koplak.</p>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-slate-800">Tentang kami</a>
+              <a href="#" className="hover:text-slate-800">Blog</a>
+            </div>
+          </footer>
+
+        </div>
+      </main>
+    </div>
+  );
+}
+
+// --- SUB-COMPONENTS ---
+// Karena di gambar tidak ada folder khusus untuk card/list item, kita biarkan disini
+
+function StatCard({ title, value, percentage, icon }) {
+  return (
+    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="font-medium text-slate-600 text-sm">{title}</h3>
+        {icon}
+      </div>
+      <div>
+        <h2 className="text-3xl font-bold text-slate-800 mb-1">{value}</h2>
+        <p className="text-sm text-slate-500">
+          <span className="text-[#10b981] font-medium">{percentage}</span> dari bulan lalu  
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ActivityItem({ title, desc, time, isLast }) {
+  return (
+    <div className="flex gap-4 relative">
+      {!isLast && <div className="absolute left-1.5 top-6 bottom-6 w-0.5 bg-slate-100"></div>}
+      <div className="w-3 h-3 bg-[#10b981] rounded-full mt-1.5 z-10 ring-4 ring-white shadow-sm"></div>
+      <div>
+        <h4 className="font-semibold text-slate-800 text-sm">{title}</h4>
+        <p className="text-slate-500 text-sm">{desc}</p>
+        <p className="text-slate-400 text-xs mt-1">{time}</p>
+      </div>
+    </div>
+  );
+}
+
+function TaskItem({ title, time }) {
+  return (
+    <div className="flex gap-3 items-start p-3 hover:bg-slate-50 rounded-lg transition-colors group cursor-pointer">
+      <div className="mt-0.5">
+        <div className="w-5 h-5 border-2 border-slate-300 rounded focus-within:border-[#10b981] flex items-center justify-center bg-white group-hover:border-[#10b981] transition-colors"></div>
+      </div>
+      <div>
+        <h4 className="font-medium text-slate-800 text-sm">{title}</h4>
+        <p className="text-slate-500 text-xs mt-0.5">{time}</p>
+      </div>
+    </div>
+  );
+}
